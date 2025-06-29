@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { username, password } = req.body;
+  const { username, password, ram, cpu } = req.body;
 
   const panelUrl = 'https://faanzyganteng.serverku.biz.id';
   const adminApiKey = 'ptla_z42nlEhAyB5cHeEZwgJSuIn0EsYB9J7HlK20DdHk7bi';
@@ -47,8 +47,7 @@ export default async function handler(req, res) {
 
     const allocations = await allocRes.json();
     const freeAlloc = allocations.data.find(a => !a.attributes.assigned);
-
-    if (!freeAlloc) return res.status(400).json({ error: 'No available allocations in node 1' });
+    if (!freeAlloc) return res.status(400).json({ error: 'No available allocations' });
 
     const serverRes = await fetch(`${panelUrl}/api/application/servers`, {
       method: 'POST',
@@ -66,11 +65,11 @@ export default async function handler(req, res) {
         docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
         startup: "npm start",
         limits: {
-          memory: 1024,
+          memory: ram,
           swap: 0,
           disk: 999999,
           io: 500,
-          cpu: 0
+          cpu: cpu
         },
         feature_limits: {
           databases: 5,
@@ -97,9 +96,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: 'Akun dan server berhasil dibuat!',
+      message: 'Server berhasil dibuat!',
       email,
-      password,
       user: user.attributes,
       server: server.attributes
     });

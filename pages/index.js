@@ -1,61 +1,64 @@
 import { useState } from 'react';
 
 export default function Home() {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
-  const [response, setResponse] = useState(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setResult(null);
+
     const res = await fetch('/api/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
+      body: JSON.stringify({ username, password })
     });
 
     const data = await res.json();
-    setResponse(data);
     setLoading(false);
+    setResult(data);
   };
 
   return (
-    <div style={{ fontFamily: 'sans-serif', padding: 30 }}>
-      <h1>🚀 Create Panel 1GB Unlimited</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: 400 }}>
-        <input type="text" placeholder="Username" required
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-          style={{ marginBottom: 10 }}
-        />
-        <input type="email" placeholder="Email" required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          style={{ marginBottom: 10 }}
-        />
-        <input type="password" placeholder="Password" required
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          style={{ marginBottom: 10 }}
-        />
+    <div style={{ padding: 20, fontFamily: 'Arial' }}>
+      <h2>Buat Akun Panel</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          required
+          onChange={(e) => setUsername(e.target.value)}
+        /><br /><br />
+        <input
+          type="text"
+          placeholder="Password"
+          value={password}
+          required
+          onChange={(e) => setPassword(e.target.value)}
+        /><br /><br />
         <button type="submit" disabled={loading}>
-          {loading ? 'Membuat akun...' : 'Buat Akun Sekarang'}
+          {loading ? 'Memproses...' : 'Buat Server'}
         </button>
       </form>
 
-      {response && (
+      {result && (
         <div style={{ marginTop: 30 }}>
-          {response.success ? (
-            <div style={{ color: 'green' }}>
-              ✅ Akun dan server berhasil dibuat!<br /><br />
-              <strong>🔑 Username:</strong> {response.user.username}<br />
-              <strong>📧 Email:</strong> {response.user.email}<br />
-              <strong>🔗 Login Panel:</strong> <a href="https://faanzyganteng.serverku.biz.id" target="_blank">Klik di sini</a>
-            </div>
+          {result.success ? (
+            <>
+              <h3>✅ Server Berhasil Dibuat</h3>
+              <p><strong>Email:</strong> {result.email}</p>
+              <p><strong>Password:</strong> {result.password}</p>
+              <p><strong>Panel Login:</strong> <a href="https://faanzyganteng.serverku.biz.id" target="_blank">Klik di sini</a></p>
+            </>
           ) : (
-            <div style={{ color: 'red' }}>
-              ❌ Gagal: {JSON.stringify(response.error)}
-            </div>
+            <>
+              <h3>❌ Gagal</h3>
+              <pre>{JSON.stringify(result.error, null, 2)}</pre>
+            </>
           )}
         </div>
       )}

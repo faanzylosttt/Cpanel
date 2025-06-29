@@ -47,98 +47,114 @@ export default function Home() {
 
   return (
     <div style={{
-      padding: 20,
-      fontFamily: 'Segoe UI',
-      maxWidth: 600,
-      margin: 'auto'
+      background: 'linear-gradient(135deg, #1f1c2c, #928dab)',
+      minHeight: '100vh',
+      padding: 30,
+      fontFamily: 'Segoe UI, sans-serif',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Buat Server Panel</h2>
-
-      <input
-        type="text"
-        placeholder="Masukkan Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-        style={{
-          width: '100%',
-          padding: 10,
-          fontSize: 16,
-          border: '1px solid #ccc',
-          borderRadius: 6,
-          marginBottom: 20
-        }}
-      />
-
-      <h4>Pilih RAM:</h4>
       <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 10,
-        marginBottom: 20
+        background: '#2e2e42',
+        padding: 30,
+        borderRadius: 12,
+        boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+        width: '100%',
+        maxWidth: 500
       }}>
-        {ramOptions.map((ram, i) => (
-          <button
-            key={ram}
-            onClick={() => setSelectedRam(ram)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: selectedRam === ram ? '#0070f3' : '#f0f0f0',
-              color: selectedRam === ram ? '#fff' : '#000',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              transition: '0.2s'
-            }}
-          >
-            {ramLabels[i]}
-          </button>
-        ))}
-      </div>
+        <h2 style={{ textAlign: 'center', marginBottom: 30 }}>⚙️ Buat Server Panel</h2>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        style={{
-          width: '100%',
-          padding: 12,
-          fontSize: 16,
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          borderRadius: 6,
-          cursor: 'pointer'
-        }}
-      >
-        {loading ? 'Memproses...' : '🚀 Buat Server Sekarang'}
-      </button>
+        <input
+          type="text"
+          placeholder="Masukkan Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          style={{
+            width: '100%',
+            padding: 12,
+            fontSize: 16,
+            border: '1px solid #444',
+            borderRadius: 8,
+            marginBottom: 20,
+            background: '#1c1c2e',
+            color: 'white'
+          }}
+        />
 
-      {result && (
+        <h4>Pilih RAM:</h4>
         <div style={{
-          marginTop: 40,
-          padding: 20,
-          borderRadius: 10,
-          background: '#f9f9f9',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 10,
+          marginBottom: 20
         }}>
-          {result.success ? (
-            <>
-              <h3 style={{ color: '#28a745' }}>✅ Server Berhasil Dibuat!</h3>
-              <p><strong>Username:</strong> {result.username}</p>
-              <p><strong>Email:</strong> {result.email}</p>
-              <p><strong>Password:</strong> {result.password}</p>
-              <p><strong>RAM:</strong> {selectedRam === 999999 ? 'Unlimited' : selectedRam / 1024 + 'GB'}</p>
-              <p><strong>CPU:</strong> {calculateCPU(selectedRam)}%</p>
-              <p><strong>Panel:</strong> <a href="https://faanzyganteng.serverku.biz.id" target="_blank">Login di sini</a></p>
-            </>
-          ) : (
-            <>
-              <h3 style={{ color: 'red' }}>❌ Gagal</h3>
-              <pre>{JSON.stringify(result.error, null, 2)}</pre>
-            </>
-          )}
+          {ramOptions.map((ram, i) => (
+            <button
+              key={ram}
+              onClick={() => setSelectedRam(ram)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: selectedRam === ram ? '#4CAF50' : '#444',
+                color: 'white',
+                border: 'none',
+                borderRadius: 6,
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              {ramLabels[i]}
+            </button>
+          ))}
         </div>
-      )}
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          style={{
+            width: '100%',
+            padding: 14,
+            fontSize: 16,
+            backgroundColor: '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            cursor: 'pointer',
+            marginBottom: 10
+          }}
+        >
+          {loading ? '🚀 Memproses...' : '💾 Buat Server'}
+        </button>
+
+        {result && (
+          <div style={{
+            marginTop: 30,
+            padding: 20,
+            borderRadius: 10,
+            background: '#1c1c2e',
+            boxShadow: '0 0 10px rgba(255,255,255,0.1)'
+          }}>
+            {result.success ? (
+              <>
+                <h3 style={{ color: '#4CAF50' }}>✅ Berhasil</h3>
+                <p><strong>Username:</strong> {result.username}</p>
+                <p><strong>Email:</strong> {result.email}</p>
+                <p><strong>Password:</strong> {result.password}</p>
+                <p><strong>RAM:</strong> {selectedRam === 999999 ? 'Unlimited' : selectedRam / 1024 + 'GB'}</p>
+                <p><strong>CPU:</strong> {calculateCPU(selectedRam)}%</p>
+                <p><strong>🔗 Panel:</strong> <a href="https://faanzyganteng.serverku.biz.id" target="_blank" style={{ color: '#03A9F4' }}>Klik untuk login</a></p>
+              </>
+            ) : (
+              <>
+                <h3 style={{ color: 'red' }}>❌ Gagal</h3>
+                <pre>{JSON.stringify(result.error, null, 2)}</pre>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

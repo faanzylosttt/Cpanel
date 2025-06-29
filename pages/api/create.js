@@ -7,6 +7,7 @@ export default async function handler(req, res) {
   const adminApiKey = 'ptla_z42nlEhAyB5cHeEZwgJSuIn0EsYB9J7HlK20DdHk7bi';
 
   try {
+    // 1. Buat user
     const userRes = await fetch(`${panelUrl}/api/application/users`, {
       method: 'POST',
       headers: {
@@ -30,7 +31,8 @@ export default async function handler(req, res) {
 
     const user = await userRes.json();
 
-    const allocRes = await fetch(`${panelUrl}/api/application/locations/1/allocations`, {
+    // 2. Ambil allocation kosong dari node ID 1
+    const allocRes = await fetch(`${panelUrl}/api/application/nodes/1/allocations`, {
       headers: {
         'Authorization': `Bearer ${adminApiKey}`,
         'Accept': 'Application/vnd.pterodactyl.v1+json'
@@ -45,8 +47,11 @@ export default async function handler(req, res) {
     const allocations = await allocRes.json();
     const freeAlloc = allocations.data.find(a => !a.attributes.assigned);
 
-    if (!freeAlloc) return res.status(400).json({ error: 'No available allocations in location 1' });
+    if (!freeAlloc) {
+      return res.status(400).json({ error: 'Tidak ada allocation kosong di Node 1' });
+    }
 
+    // 3. Buat server
     const serverRes = await fetch(`${panelUrl}/api/application/servers`, {
       method: 'POST',
       headers: {

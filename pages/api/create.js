@@ -30,6 +30,23 @@ export default async function handler(req, res) {
 
     const user = await userRes.json();
 
+    const allocRes = await fetch(`${panelUrl}/api/application/locations/1/allocations`, {
+      headers: {
+        'Authorization': `Bearer ${adminApiKey}`,
+        'Accept': 'Application/vnd.pterodactyl.v1+json'
+      }
+    });
+
+    if (!allocRes.ok) {
+      const error = await allocRes.json();
+      return res.status(allocRes.status).json({ error });
+    }
+
+    const allocations = await allocRes.json();
+    const freeAlloc = allocations.data.find(a => !a.attributes.assigned);
+
+    if (!freeAlloc) return res.status(400).json({ error: 'No available allocations in location 1' });
+
     const serverRes = await fetch(`${panelUrl}/api/application/servers`, {
       method: 'POST',
       headers: {
@@ -61,7 +78,7 @@ export default async function handler(req, res) {
           USER_UPLOAD: "1"
         },
         allocation: {
-          default: 1
+          default: freeAlloc.attributes.id
         },
         start_on_completion: true
       })

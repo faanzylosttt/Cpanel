@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home({ username, role }) {
   const [inputUsername, setInputUsername] = useState('');
@@ -94,6 +95,26 @@ export default function Home({ username, role }) {
       >
         {loading ? 'Memproses...' : '🚀 Buat Server Sekarang'}
       </button>
+
+      {role === 'owner' && (
+        <Link href="/list">
+          <button
+            style={{
+              marginTop: 20,
+              width: '100%',
+              padding: 12,
+              fontSize: 16,
+              backgroundColor: '#0070f3',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer'
+            }}
+          >
+            📋 Lihat Semua Server (Owner)
+          </button>
+        </Link>
+      )}
 
       {result && (
         <div style={{

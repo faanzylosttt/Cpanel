@@ -1,11 +1,16 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const cookies = document.cookie;
+    if (cookies.includes('role=')) router.push('/');
+  }, []);
 
   const handleLogin = async () => {
     const res = await fetch('/api/login', {
@@ -16,7 +21,6 @@ export default function LoginPage() {
 
     const data = await res.json();
     if (!res.ok) return alert(data.error);
-
     router.push('/');
   };
 

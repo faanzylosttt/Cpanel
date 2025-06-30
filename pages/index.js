@@ -1,29 +1,14 @@
+import { useState } from 'react';
 
-import { useEffect, useState } from 'react';
-
-export default function Home() {
-  const [username, setUsername] = useState('');
-  const [role, setRole] = useState('');
-  const [access, setAccess] = useState(false);
+export default function Home({ username, role }) {
   const [inputUsername, setInputUsername] = useState('');
   const [selectedRam, setSelectedRam] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const getCookie = (name) => {
-      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-      return match ? match[2] : null;
-    };
-    const u = getCookie('username');
-    const r = getCookie('role');
-    setUsername(u);
-    setRole(r);
-    setAccess(!!u && !!r);
-  }, []);
-
   const ramOptions = [1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 999999];
   const ramLabels = ['1GB', '2GB', '3GB', '4GB', '5GB', '6GB', '7GB', '8GB', '9GB', '10GB', '11GB', 'Unlimited'];
+
   const calculateCPU = (ram) => ram === 999999 ? 0 : Math.min(Math.floor(ram / 1024 * 50), 400);
 
   const handleSubmit = async () => {
@@ -46,20 +31,11 @@ export default function Home() {
     setResult({ ...data, password, username: inputUsername });
   };
 
-  if (!access) return (
-    <div style={{ padding: 50, textAlign: 'center' }}>
-      ❌ Tidak bisa akses. <a href="/login">Login dulu</a>.
-    </div>
-  );
-
   return (
-    <div style={{
-      padding: 20,
-      fontFamily: 'Segoe UI',
-      maxWidth: 600,
-      margin: 'auto'
-    }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Panel Builder ({username})</h2>
+    <div style={{ padding: 20, fontFamily: 'Segoe UI', maxWidth: 600, margin: 'auto' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>
+        🎮 Panel Builder ({username} | {role})
+      </h2>
 
       <input
         type="text"
@@ -94,8 +70,7 @@ export default function Home() {
               color: selectedRam === ram ? '#fff' : '#000',
               border: 'none',
               borderRadius: 6,
-              cursor: 'pointer',
-              transition: '0.2s'
+              cursor: 'pointer'
             }}
           >
             {ramLabels[i]}
@@ -148,4 +123,26 @@ export default function Home() {
       )}
     </div>
   );
+}
+
+export async function getServerSideProps({ req }) {
+  const cookie = req.headers.cookie || '';
+  const username = cookie.match(/username=([^;]+)/)?.[1] || null;
+  const role = cookie.match(/role=([^;]+)/)?.[1] || null;
+
+  if (!username || !role) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    };
+  }
+
+  return {
+    props: {
+      username,
+      role
+    }
+  };
 }

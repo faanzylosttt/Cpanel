@@ -1,49 +1,56 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState('');
+  const [access, setAccess] = useState(false);
+  const [inputUsername, setInputUsername] = useState('');
   const [selectedRam, setSelectedRam] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const ramOptions = [
-    1024, 2048, 3072, 4096, 5120,
-    6144, 7168, 8192, 9216, 10240,
-    11264, 999999
-  ];
+  useEffect(() => {
+    const getCookie = (name) => {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? match[2] : null;
+    };
+    const u = getCookie('username');
+    const r = getCookie('role');
+    setUsername(u);
+    setRole(r);
+    setAccess(!!u && !!r);
+  }, []);
 
-  const ramLabels = [
-    '1GB', '2GB', '3GB', '4GB', '5GB',
-    '6GB', '7GB', '8GB', '9GB', '10GB',
-    '11GB', 'Unlimited'
-  ];
-
-  const calculateCPU = (ram) => {
-    return ram === 999999 ? 0 : Math.min(Math.floor(ram / 1024 * 50), 400);
-  };
+  const ramOptions = [1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 999999];
+  const ramLabels = ['1GB', '2GB', '3GB', '4GB', '5GB', '6GB', '7GB', '8GB', '9GB', '10GB', '11GB', 'Unlimited'];
+  const calculateCPU = (ram) => ram === 999999 ? 0 : Math.min(Math.floor(ram / 1024 * 50), 400);
 
   const handleSubmit = async () => {
-    if (!username || !selectedRam) return alert("Lengkapi semua data!");
-
+    if (!inputUsername || !selectedRam) return alert("Lengkapi semua data!");
     setLoading(true);
     setResult(null);
-
     const password = Math.random().toString(36).substring(2, 10);
     const res = await fetch('/api/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username,
+        username: inputUsername,
         password,
         ram: selectedRam,
         cpu: calculateCPU(selectedRam)
       })
     });
-
     const data = await res.json();
     setLoading(false);
-    setResult({ ...data, password, username });
+    setResult({ ...data, password, username: inputUsername });
   };
+
+  if (!access) return (
+    <div style={{ padding: 50, textAlign: 'center' }}>
+      ❌ Tidak bisa akses. <a href="/login">Login dulu</a>.
+    </div>
+  );
 
   return (
     <div style={{
@@ -52,13 +59,13 @@ export default function Home() {
       maxWidth: 600,
       margin: 'auto'
     }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Buat Server Panel</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Panel Server Builder</h2>
 
       <input
         type="text"
         placeholder="Masukkan Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        value={inputUsername}
+        onChange={(e) => setInputUsername(e.target.value)}
         required
         style={{
           width: '100%',

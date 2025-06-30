@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -59,7 +59,7 @@ export default function Home() {
       maxWidth: 600,
       margin: 'auto'
     }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Panel Server Builder</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>🎮 Panel Builder ({username})</h2>
 
       <input
         type="text"
